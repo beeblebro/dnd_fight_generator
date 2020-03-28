@@ -1,12 +1,15 @@
 import json
 import pandas as pd
+from tabulate import tabulate
 from itertools import combinations_with_replacement
+
 
 def get_first_suitable(xs, condition):
     for x in xs:
         if condition(x):
             return x
     return x[-1]
+
 
 def get_danger_booster(n_heroes, n_monsters):
     with open('multipliers.json') as fp:
@@ -15,16 +18,20 @@ def get_danger_booster(n_heroes, n_monsters):
     x = get_first_suitable(xss[xs].keys(), lambda x: int(x) >= n_monsters)
     return xss[xs][x]
 
+
 def get_combinations(danger, number, experience):
     df = pd.DataFrame({'combinations': list(combinations_with_replacement(danger, number))})
     df['sum'] = df['combinations'].apply(sum)
     df = df[df['sum'] <= experience]
     return df
 
+
 def print_output(**kwargs):
     with open("output_format") as fp:
-        output = fp.read()
-        print(output.format(**kwargs))
+        output = fp.read().format(**kwargs)
+        print(output)
+        return output
+        
 
 def input_handle(name, invintation, target_type, defaults):
     default = defaults.get(name)
@@ -33,7 +40,8 @@ def input_handle(name, invintation, target_type, defaults):
     else:
         invintation += ': '
     return target_type(input(invintation) or default)
-        
+
+
 def generate_fight(experience, n_strong, n_weak, n_heroes=4, insignificance_threshold=0.15):
     danger_booster = get_danger_booster(n_heroes, n_strong)
     threshold = insignificance_threshold * experience
@@ -51,9 +59,15 @@ def generate_fight(experience, n_strong, n_weak, n_heroes=4, insignificance_thre
     df['sum_multiplied'] = df['sum'] * danger_booster
     df = df[df['sum'] <= exp_corrected].sort_values('sum', ascending=False)
     
-    print_output(n_heroes=n_heroes, experience=experience, n_strong=n_strong, n_weak=n_weak, threshold=threshold, insignificance_threshold=insignificance_threshold, danger_booster=danger_booster)
-    print(df.head().reset_index(drop=True))
-
+    output_message = print_output(n_heroes=n_heroes, experience=experience, n_strong=n_strong, n_weak=n_weak, threshold=threshold, insignificance_threshold=insignificance_threshold, danger_booster=danger_booster)
+    df = df.head().reset_index(drop=True)
+    df['Враги'] = df['combinations_strong'] + df['combinations_weak']
+    df['Сумма'] = df['sum_multiplied']
+    df = df[['Враги', 'Сумма']]
+#     df = tabulate(df, headers='keys', tablefmt='psql')
+    print(df)
+    return(output_message, df.to_string(index=False))
+    
 
 if __name__=='__main__':
     with open("defaults.json") as fp:
