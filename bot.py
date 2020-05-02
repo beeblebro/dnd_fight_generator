@@ -1,13 +1,15 @@
 import telebot
+import logging
 from telebot import types
 from generate_fight import generate_fight
 
 
-with open("token") as fp:
+with open("config/token") as fp:
     token = fp.read()
 
 bot = telebot.TeleBot(token)
 default_error_message = "Что-то пошло не так"
+telebot.logger.setLevel(logging.DEBUG)
 
 
 class RandomFight:
@@ -27,7 +29,7 @@ def is_digit(message, function, error_message="Нужно ввести цело�
 
 @bot.message_handler(commands=['help'])
 def help(message):
-    with open("help_message") as fp:
+    with open("config/help_message") as fp:
         help_message = fp.read()
     bot.send_message(message.chat.id, help_message)
 
@@ -49,7 +51,6 @@ def n_heroes(message):
         bot.register_next_step_handler(answer, lambda x: experience(x, fight))
     except Exception as e:
         bot.reply_to(message, default_error_message)
-        raise e
 
         
 def experience(message, fight):
@@ -60,7 +61,6 @@ def experience(message, fight):
         bot.register_next_step_handler(answer, lambda x: insignificance_threshold(x, fight))
     except Exception as e:
         bot.reply_to(message, default_error_message)
-        raise e
 
 
 def insignificance_threshold(message, fight):
@@ -98,10 +98,10 @@ def n_weak(message, fight):
         bot.send_message(message.chat.id, table)
     except Exception as e:
         bot.reply_to(message, default_error_message)
-        raise e
 
 
 if __name__ == '__main__':
 #     bot.enable_save_next_step_handlers(delay=2)
 #     bot.load_next_step_handlers()
-    bot.polling()
+#     bot.polling(none_stop=True)
+    bot.infinity_polling(True)

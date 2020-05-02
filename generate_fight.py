@@ -12,7 +12,7 @@ def get_first_suitable(xs, condition):
 
 
 def get_danger_booster(n_heroes, n_monsters):
-    with open('multipliers.json') as fp:
+    with open('config/multipliers.json') as fp:
         xss = json.load(fp)
     xs = get_first_suitable(xss.keys(), lambda x: int(x) >= n_heroes)
     x = get_first_suitable(xss[xs].keys(), lambda x: int(x) >= n_monsters)
@@ -27,11 +27,11 @@ def get_combinations(danger, number, experience):
 
 
 def print_output(**kwargs):
-    with open("output_format") as fp:
+    with open("config/output_format") as fp:
         output = fp.read().format(**kwargs)
         print(output)
         return output
-        
+
 
 def input_handle(name, invintation, target_type, defaults):
     default = defaults.get(name)
@@ -47,7 +47,7 @@ def generate_fight(experience, n_strong, n_weak, n_heroes=4, insignificance_thre
     threshold = insignificance_threshold * experience
     exp_corrected = experience / danger_booster
     
-    danger = list(pd.read_csv("danger.csv", names=['value'], header=None)['value'])
+    danger = list(pd.read_csv("config/danger.csv", names=['value'], header=None)['value'])
     strong = list(filter(lambda x: threshold < x <= exp_corrected, danger))
     weak = list(filter(lambda x: x <= threshold, danger))
     
@@ -64,13 +64,12 @@ def generate_fight(experience, n_strong, n_weak, n_heroes=4, insignificance_thre
     df['Враги'] = df['combinations_strong'] + df['combinations_weak']
     df['Сумма'] = df['sum_multiplied']
     df = df[['Враги', 'Сумма']]
-#     df = tabulate(df, headers='keys', tablefmt='psql')
-    print(df)
+    print(tabulate(df, headers='keys', tablefmt='psql'))
     return(output_message, df.to_string(index=False))
-    
+
 
 if __name__=='__main__':
-    with open("defaults.json") as fp:
+    with open("config/defaults.json") as fp:
         defaults = json.load(fp)
     generate_fight(
         input_handle("experience", "Суммарный опыт", int, defaults),
