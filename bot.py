@@ -4,7 +4,7 @@ from telebot import types
 from generate_fight import generate_fight
 
 
-with open("config/token") as fp:
+with open("config/.token") as fp:
     token = fp.read()
 
 bot = telebot.TeleBot(token)
