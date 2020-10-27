@@ -5,7 +5,7 @@ chardet==3.0.4
 cloud-init==19.4
 command-not-found==0.3
 configobj==5.0.6
-cryptography==2.1.4
+cryptography==3.2
 distro-info===0.18ubuntu0.18.04.1
 greenlet==0.4.12
 idna==2.6
