@@ -9,7 +9,7 @@ cryptography==2.1.4
 distro-info===0.18ubuntu0.18.04.1
 greenlet==0.4.12
 idna==2.6
-Jinja2==2.10
+Jinja2==2.11.3
 jsonpatch==1.16
 jsonpointer==1.10
 jsonschema==2.6.0
